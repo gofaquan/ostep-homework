@@ -5,6 +5,7 @@ import sys
 from optparse import OptionParser
 import random
 
+
 # to make Python2 and Python3 act the same -- how dumb
 def random_seed(seed):
     try:
@@ -12,6 +13,7 @@ def random_seed(seed):
     except:
         random.seed(seed)
     return
+
 
 # process switch behavior
 SCHED_SWITCH_ON_IO = 'SWITCH_ON_IO'
@@ -65,7 +67,7 @@ class scheduler:
         proc_id = self.new_process()
         for line in program.split(','):
             opcode = line[0]
-            if opcode == 'c': # compute
+            if opcode == 'c':  # compute
                 num = int(line[1:])
                 for i in range(num):
                     self.proc_info[proc_id][PROC_CODE].append(DO_COMPUTE)
@@ -87,7 +89,7 @@ class scheduler:
             print('  and Y is the percent change that an instruction is CPU not IO')
             exit(1)
 
-        num_instructions, chance_cpu = int(tmp[0]), float(tmp[1])/100.0
+        num_instructions, chance_cpu = int(tmp[0]), float(tmp[1]) / 100.0
         for i in range(num_instructions):
             if random.random() < chance_cpu:
                 self.proc_info[proc_id][PROC_CODE].append(DO_COMPUTE)
@@ -100,22 +102,22 @@ class scheduler:
     def move_to_ready(self, expected, pid=-1):
         if pid == -1:
             pid = self.curr_proc
-        assert(self.proc_info[pid][PROC_STATE] == expected)
+        assert (self.proc_info[pid][PROC_STATE] == expected)
         self.proc_info[pid][PROC_STATE] = STATE_READY
         return
 
     def move_to_wait(self, expected):
-        assert(self.proc_info[self.curr_proc][PROC_STATE] == expected)
+        assert (self.proc_info[self.curr_proc][PROC_STATE] == expected)
         self.proc_info[self.curr_proc][PROC_STATE] = STATE_WAIT
         return
 
     def move_to_running(self, expected):
-        assert(self.proc_info[self.curr_proc][PROC_STATE] == expected)
+        assert (self.proc_info[self.curr_proc][PROC_STATE] == expected)
         self.proc_info[self.curr_proc][PROC_STATE] = STATE_RUNNING
         return
 
     def move_to_done(self, expected):
-        assert(self.proc_info[self.curr_proc][PROC_STATE] == expected)
+        assert (self.proc_info[self.curr_proc][PROC_STATE] == expected)
         self.proc_info[self.curr_proc][PROC_STATE] = STATE_DONE
         return
 
@@ -156,7 +158,7 @@ class scheduler:
         num_active = 0
         for pid in range(len(self.proc_info)):
             if self.proc_info[pid][PROC_STATE] == STATE_READY or \
-                   self.proc_info[pid][PROC_STATE] == STATE_RUNNING:
+                    self.proc_info[pid][PROC_STATE] == STATE_RUNNING:
                 num_active += 1
         return num_active
 
@@ -198,7 +200,7 @@ class scheduler:
         self.move_to_running(STATE_READY)
 
         # OUTPUT: headers for each column
-        print('%s' % 'Time', end='') 
+        print('%s' % 'Time', end='')
         for pid in range(len(self.proc_info)):
             print('%14s' % ('PID:%2d' % (pid)), end='')
         print('%14s' % 'CPU', end='')
@@ -233,11 +235,11 @@ class scheduler:
                             # this is the only thing to run: so run it
                             self.next_proc(pid)
                     self.check_if_done()
-            
+
             # if current proc is RUNNING and has an instruction, execute it
             instruction_to_execute = ''
             if self.proc_info[self.curr_proc][PROC_STATE] == STATE_RUNNING and \
-                   len(self.proc_info[self.curr_proc][PROC_CODE]) > 0:
+                    len(self.proc_info[self.curr_proc][PROC_CODE]) > 0:
                 instruction_to_execute = self.proc_info[self.curr_proc][PROC_CODE].pop(0)
                 cpu_busy += 1
 
@@ -248,7 +250,7 @@ class scheduler:
                 print('%3d ' % clock_tick, end='')
             for pid in range(len(self.proc_info)):
                 if pid == self.curr_proc and instruction_to_execute != '':
-                    print('%14s' % ('RUN:'+instruction_to_execute), end='')
+                    print('%14s' % ('RUN:' + instruction_to_execute), end='')
                 else:
                     print('%14s' % (self.proc_info[pid][PROC_STATE]), end='')
 
@@ -278,26 +280,37 @@ class scheduler:
             # ENDCASE: check if currently running thing is out of instructions
             self.check_if_done()
         return (cpu_busy, io_busy, clock_tick)
-        
+
+
 #
 # PARSE ARGUMENTS
 #
 
 parser = OptionParser()
 parser.add_option('-s', '--seed', default=0, help='the random seed', action='store', type='int', dest='seed')
-parser.add_option('-P', '--program', default='', help='more specific controls over programs', action='store', type='string', dest='program')
-parser.add_option('-l', '--processlist', default='', help='a comma-separated list of processes to run, in the form X1:Y1,X2:Y2,... where X is the number of instructions that process should run, and Y the chances (from 0 to 100) that an instruction will use the CPU or issue an IO', action='store', type='string', dest='process_list')
-parser.add_option('-L', '--iolength', default=5, help='how long an IO takes', action='store', type='int', dest='io_length')
-parser.add_option('-S', '--switch', default='SWITCH_ON_IO', help='when to switch between processes: SWITCH_ON_IO, SWITCH_ON_END', action='store', type='string', dest='process_switch_behavior')
-parser.add_option('-I', '--iodone', default='IO_RUN_LATER', help='type of behavior when IO ends: IO_RUN_LATER, IO_RUN_IMMEDIATE', action='store', type='string', dest='io_done_behavior')
+parser.add_option('-P', '--program', default='', help='more specific controls over programs', action='store',
+                  type='string', dest='program')
+parser.add_option('-l', '--processlist', default='',
+                  help='a comma-separated list of processes to run, in the form X1:Y1,X2:Y2,... where X is the number of instructions that process should run, and Y the chances (from 0 to 100) that an instruction will use the CPU or issue an IO',
+                  action='store', type='string', dest='process_list')
+parser.add_option('-L', '--iolength', default=5, help='how long an IO takes', action='store', type='int',
+                  dest='io_length')
+parser.add_option('-S', '--switch', default='SWITCH_ON_IO',
+                  help='when to switch between processes: SWITCH_ON_IO, SWITCH_ON_END', action='store', type='string',
+                  dest='process_switch_behavior')
+parser.add_option('-I', '--iodone', default='IO_RUN_LATER',
+                  help='type of behavior when IO ends: IO_RUN_LATER, IO_RUN_IMMEDIATE', action='store', type='string',
+                  dest='io_done_behavior')
 parser.add_option('-c', help='compute answers for me', action='store_true', default=False, dest='solve')
-parser.add_option('-p', '--printstats', help='print statistics at end; only useful with -c flag (otherwise stats are not printed)', action='store_true', default=False, dest='print_stats')
+parser.add_option('-p', '--printstats',
+                  help='print statistics at end; only useful with -c flag (otherwise stats are not printed)',
+                  action='store_true', default=False, dest='print_stats')
 (options, args) = parser.parse_args()
 
 random_seed(options.seed)
 
-assert(options.process_switch_behavior == SCHED_SWITCH_ON_IO or options.process_switch_behavior == SCHED_SWITCH_ON_END)
-assert(options.io_done_behavior == IO_RUN_IMMEDIATE or options.io_done_behavior == IO_RUN_LATER)
+assert (options.process_switch_behavior == SCHED_SWITCH_ON_IO or options.process_switch_behavior == SCHED_SWITCH_ON_END)
+assert (options.io_done_behavior == IO_RUN_IMMEDIATE or options.io_done_behavior == IO_RUN_LATER)
 
 s = scheduler(options.process_switch_behavior, options.io_done_behavior, options.io_length)
 
@@ -309,7 +322,7 @@ else:
     for p in options.process_list.split(','):
         s.load(p)
 
-assert(options.io_length >= 0)
+assert (options.io_length >= 0)
 
 if options.solve == False:
     print('Produce a trace of what would happen when you run these processes:')
@@ -337,6 +350,6 @@ if options.solve == False:
 if options.print_stats:
     print('')
     print('Stats: Total Time %d' % clock_tick)
-    print('Stats: CPU Busy %d (%.2f%%)' % (cpu_busy, 100.0 * float(cpu_busy)/clock_tick))
-    print('Stats: IO Busy  %d (%.2f%%)' % (io_busy, 100.0 * float(io_busy)/clock_tick))
+    print('Stats: CPU Busy %d (%.2f%%)' % (cpu_busy, 100.0 * float(cpu_busy) / clock_tick))
+    print('Stats: IO Busy  %d (%.2f%%)' % (io_busy, 100.0 * float(io_busy) / clock_tick))
     print('')

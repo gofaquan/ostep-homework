@@ -327,7 +327,7 @@ class client:
         self.bias    = bias      # bias
         self.actions = actions   # schedule exactly?
         self.solve   = solve     # show answers?
-        self.detail  = detail    # how much of an answer to show
+        self.detail  = detail    # how much of an answer.md to show
 
         # cache
         self.cache   = cache(self.name, self.cid, self.solve, self.detail)
