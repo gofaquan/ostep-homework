@@ -15,12 +15,10 @@ python process-run.py -l 5:100,5:100 -c
 令的进程（都要使用 CPU），并且只是简单地发出 I/O 并等待它完成。完成这两个进程需要
 多长时间？利用-c 检查你的答案是否正确。
 ```python
-
-
- 	python process-run.py -l 4:100,1:0
+python process-run.py -l 4:100,1:0
 
  	#11 个 ticks，结合答案理解，因为 4+1+5+1 = 11 ，4:100 => 4 , 1:0 => 1 * 5,默认*5，-L 可修改, 如  python process-run.py -l 4:100,1:0 -L 1 -c
- 	python process-run.py -l 4:100,1:0 -c
+python process-run.py -l 4:100,1:0 -c
 ```
 
 3．现在交换进程的顺序：./process-run.py -l 1:0,4:100。现在发生了什么？交换顺序是否
